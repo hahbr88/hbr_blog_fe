@@ -36,6 +36,7 @@ import {
 } from '@mdxeditor/editor';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN;
 
 async function imageUploadHandler(image: File) {
 	if (!API_BASE) throw new Error('NEXT_PUBLIC_API_BASE_URL is not set');
@@ -43,12 +44,16 @@ async function imageUploadHandler(image: File) {
 	const formData = new FormData();
 	formData.append('image', image);
 
-	const res = await fetch(`${API_BASE}/uploads/images`, {
+	const res = await fetch(`${API_BASE}/api/v1/uploads/images`, {
 		method: 'POST',
+		headers: ADMIN_TOKEN ? { 'X-Admin-Token': ADMIN_TOKEN } : undefined,
 		body: formData,
 	});
 
-	if (!res.ok) throw new Error('Image upload failed');
+	if (!res.ok) {
+		const txt = await res.text().catch(() => '');
+		throw new Error(`Image upload failed (${res.status}): ${txt}`);
+	}
 	const data = (await res.json()) as { url: string };
 	return data.url;
 }

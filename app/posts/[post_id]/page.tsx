@@ -59,9 +59,8 @@ export default async function PostDetailPage({
 				<h1 className="font-bold text-3xl tracking-tight">{post.title}</h1>
 
 				<div className="mt-3 flex flex-wrap items-center gap-2 text-slate-500 text-sm">
-					{/* {post.author ? <span>{post.author}</span> : null} */}
 					{post.created_at ? (
-						<span>· {new Date(post.created_at).toLocaleDateString()}</span>
+						<span>{new Date(post.created_at).toLocaleString('ko-KR')}</span>
 					) : null}
 
 					{post.tags?.length ? (
@@ -83,8 +82,7 @@ export default async function PostDetailPage({
 			</header>
 
 			{/* ✅ MDXEditor로 작성된 텍스트를 “Markdown 렌더링”으로 우선 처리(안전/간단) */}
-			<article
-			>
+			<article className="prose prose-slate max-w-none">
 				<ReactMarkdown
 					remarkPlugins={[remarkGfm]}
 					components={{
