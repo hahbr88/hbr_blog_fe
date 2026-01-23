@@ -1,7 +1,7 @@
 'use client';
 
+import type { ReactNode, PointerEvent as ReactPointerEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 
 type DraggableWindowProps = {
 	title?: string;
@@ -109,7 +109,16 @@ export default function DraggableWindow({
 			window.removeEventListener('pointermove', handleMove);
 			window.removeEventListener('pointerup', handleUp);
 		};
-	}, [isDragging, isMinimized, liveTransform]);
+	}, [
+		isDragging,
+		isMinimized,
+		liveTransform,
+		viewportSize.width,
+		viewportSize.height,
+		windowSize.width,
+		windowSize.height,
+		floating,
+	]);
 
 	const handleDragStart = (event: ReactPointerEvent<HTMLDivElement>) => {
 		if (isMinimized) return;
@@ -140,20 +149,18 @@ export default function DraggableWindow({
 		requestAnimationFrame(updateSizes);
 	};
 
-	const minimizeOffsetX =
-		viewportSize.width / 2 - windowSize.width / 2 - 24;
-	const minimizeOffsetY =
-		viewportSize.height / 2 - windowSize.height / 2 - 24;
+	const minimizeOffsetX = viewportSize.width / 2 - windowSize.width / 2 - 24;
+	const minimizeOffsetY = viewportSize.height / 2 - windowSize.height / 2 - 24;
 
 	const minimizedTransform = useMemo(
 		() =>
 			floating
 				? `translate3d(calc(-50% + ${position.x + minimizeOffsetX}px), calc(-50% + ${
 						position.y + minimizeOffsetY
-				  }px), 0) scale(0.1)`
+					}px), 0) scale(0.1)`
 				: `translate3d(${position.x + minimizeOffsetX}px, ${
 						position.y + minimizeOffsetY
-				  }px, 0) scale(0.1)`,
+					}px, 0) scale(0.1)`,
 		[position.x, position.y, minimizeOffsetX, minimizeOffsetY, floating],
 	);
 
@@ -165,7 +172,9 @@ export default function DraggableWindow({
 		[position.x, position.y, floating],
 	);
 
-	const windowSizeClassName = isMaximized ? maximizedClassName : normalClassName;
+	const windowSizeClassName = isMaximized
+		? maximizedClassName
+		: normalClassName;
 	const floatingClassName = floating ? 'absolute left-1/2 top-1/2' : '';
 
 	return (
