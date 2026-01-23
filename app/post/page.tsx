@@ -1,15 +1,11 @@
 'use client';
 
-import {
-	Button,
-	Input,
-	Modal,
-	TagsInput,
-} from '@mantine/core';
+import { Button, Input, Modal, TagsInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
+import {  
 	IconArrowLeft,
 	IconBookUpload,
+	IconList,
 	IconPencil,
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';

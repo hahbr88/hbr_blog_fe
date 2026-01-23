@@ -1,9 +1,11 @@
 import { CodeHighlight, InlineCodeHighlight } from '@mantine/code-highlight';
+import { Button } from '@mantine/core';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import GotoListButton from '@/components/buttons/GoToListButton';
 import { getPostById } from '@/lib/blogApi.server';
 
 export const revalidate = 60;
@@ -80,6 +82,10 @@ export default async function PostDetailPage({
 					) : null}
 				</div>
 			</header>
+
+			<div>
+				<GotoListButton />
+			</div>
 
 			{/* ✅ MDXEditor로 작성된 텍스트를 “Markdown 렌더링”으로 우선 처리(안전/간단) */}
 			<article className="prose prose-slate max-w-none">

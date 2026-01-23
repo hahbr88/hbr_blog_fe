@@ -4,8 +4,10 @@
 	"formatter": {
 		"enabled": true
 	},
-	"files": {
-		"ignore": ["app/globals.css"]
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
 	},
 
 	"linter": {

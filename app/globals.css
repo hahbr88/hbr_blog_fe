@@ -119,3 +119,14 @@ body {
     transform: translate3d(0, 0, 0);
   }
 }
+
+@keyframes blink {
+  0%,
+  40% {
+    opacity: 1;
+  }
+  60%,
+  100% {
+    opacity: 0;
+  }
+}
