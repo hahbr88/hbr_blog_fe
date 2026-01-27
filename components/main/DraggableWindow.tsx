@@ -1,7 +1,16 @@
 'use client';
 
+import { IconMaximize, IconMinus, IconX } from '@tabler/icons-react';
 import type { ReactNode, PointerEvent as ReactPointerEvent } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
+import { useDock } from '@/components/main/DockContext';
 
 type DraggableWindowProps = {
 	title?: string;
@@ -24,6 +33,8 @@ export default function DraggableWindow({
 	initialPosition = { x: 0, y: 0 },
 	floating = true,
 }: DraggableWindowProps) {
+	const id = useId();
+	const { registerDockItem, unregisterDockItem } = useDock();
 	const [isMinimized, setIsMinimized] = useState(false);
 	const [isMaximized, setIsMaximized] = useState(false);
 	const [position, setPosition] = useState(initialPosition);
@@ -44,6 +55,19 @@ export default function DraggableWindow({
 		positionRef.current = position;
 		dragPosRef.current = position;
 	}, [position]);
+
+	useEffect(() => {
+		if (!isMinimized) return;
+		registerDockItem({
+			id,
+			label: dockLabel,
+			onRestore: () => {
+				setIsMinimized(false);
+				unregisterDockItem(id);
+			},
+		});
+		return () => unregisterDockItem(id);
+	}, [dockLabel, id, isMinimized, registerDockItem, unregisterDockItem]);
 
 	const updateSizes = useCallback(() => {
 		if (windowRef.current) {
@@ -138,10 +162,6 @@ export default function DraggableWindow({
 		setIsDragging(false);
 	};
 
-	const handleRestore = () => {
-		setIsMinimized(false);
-	};
-
 	const handleToggleMaximize = () => {
 		setIsMaximized((prev) => !prev);
 		setPosition({ x: 0, y: 0 });
@@ -189,41 +209,52 @@ export default function DraggableWindow({
 				}}
 			>
 				<div
-					className="flex cursor-grab select-none items-center gap-2 rounded-t-2xl border-[rgba(120,255,160,0.15)] border-b bg-[rgba(6,12,6,0.6)] px-3.5 py-2.5 font-mono text-[12px] text-[rgba(150,255,190,0.7)] uppercase tracking-[0.2em] active:cursor-grabbing"
+					className="flex touch-none select-none items-center gap-2 rounded-t-2xl border-[rgba(120,255,160,0.15)] border-b bg-[rgba(6,12,6,0.6)] px-3.5 py-2.5 font-mono text-[12px] text-[rgba(150,255,190,0.7)] uppercase tracking-[0.2em]"
 					onPointerDown={handleDragStart}
 				>
-					<button
-						type="button"
-						className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#ff5f56] shadow-[0_0_8px_rgba(0,0,0,0.6)]"
-						onPointerDown={(event) => event.stopPropagation()}
-						onClick={onCloseRequest}
-					/>
-					<button
-						type="button"
-						className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#ffbd2e] shadow-[0_0_8px_rgba(0,0,0,0.6)]"
-						onPointerDown={(event) => event.stopPropagation()}
-						onClick={handleMinimize}
-					/>
-					<button
-						type="button"
-						className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#27c93f] shadow-[0_0_8px_rgba(0,0,0,0.6)]"
-						onPointerDown={(event) => event.stopPropagation()}
-						onClick={handleToggleMaximize}
-					/>
+					<div className="group flex gap-2">
+						<button
+							type="button"
+							className="relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#ff5f56] shadow-[0_0_8px_rgba(0,0,0,0.6)]"
+							onPointerDown={(event) => event.stopPropagation()}
+							onClick={onCloseRequest}
+						>
+							<IconX
+								aria-hidden
+								size={10}
+								className="text-black/70 opacity-0 transition group-hover:opacity-100"
+							/>
+						</button>
+						<button
+							type="button"
+							className="relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#ffbd2e] shadow-[0_0_8px_rgba(0,0,0,0.6)]"
+							onPointerDown={(event) => event.stopPropagation()}
+							onClick={handleMinimize}
+						>
+							<IconMinus
+								aria-hidden
+								size={10}
+								className="text-black/70 opacity-0 transition group-hover:opacity-100"
+							/>
+						</button>
+						<button
+							type="button"
+							className="relative inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#27c93f] shadow-[0_0_8px_rgba(0,0,0,0.6)]"
+							onPointerDown={(event) => event.stopPropagation()}
+							onClick={handleToggleMaximize}
+						>
+							<IconMaximize
+								aria-hidden
+								size={10}
+								className="text-black/70 opacity-0 transition group-hover:opacity-100"
+							/>
+						</button>
+					</div>
 					<span className="ml-auto">{title}</span>
 				</div>
 				<div>{children}</div>
 			</div>
-			{isMinimized ? (
-				<button
-					type="button"
-					className="pointer-events-auto fixed right-6 bottom-6 flex items-center gap-2 rounded-full border border-[rgba(120,255,160,0.2)] bg-[rgba(6,12,6,0.7)] px-4 py-2 font-mono text-[rgba(150,255,190,0.75)] text-xs uppercase tracking-[0.2em] shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-transform duration-300 hover:scale-105"
-					onClick={handleRestore}
-				>
-					<span className="inline-block h-2 w-2 rounded-full bg-[#27c93f]" />
-					{dockLabel}
-				</button>
-			) : null}
+			{isMinimized ? null : null}
 		</>
 	);
 }
