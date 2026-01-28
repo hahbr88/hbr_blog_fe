@@ -5,10 +5,10 @@ import TerminalOverlay from '@/components/main/TerminalOverlay';
 
 export default function Home() {
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-zinc-0 font-sans dark:bg-black">
-			<main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
+		<div className="relative min-h-screen overflow-hidden bg-black font-sans text-zinc-100">
+			<BackgroundCanvas />
+			<main className="relative z-10 min-h-screen w-full px-4 py-6 sm:px-8 sm:py-10 lg:px-16 lg:py-14">
 				<TerminalOverlay />
-				<BackgroundCanvas />
 			</main>
 		</div>
 	);
